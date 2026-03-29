@@ -1,0 +1,31 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  IMAGE_NAME: "ranjithasu/sprint-petclinic"
+  IMAGE_TAG: "4.0"
+gitleaks:
+  stage: test
+  image:
+    name: zricethezav/gitleaks
+    entrypoint: [""]
+  script:
+    # source path will be current directory as gitlab-ci loads the application code into every container for every job.
+    - gitleaks detect --verbose --source .
+
+build-push-image:
+  stage: build
+  image: docker:29.2.1
+  services:
+    - docker:29.2.1-dind
+  variables:
+    DOCKER_BUILDKIT: 1
+  before_script:
+    - echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USERNAME --password-stdin
+  script:
+    - docker pull $IMAGE_NAME:$IMAGE_TAG || true
+    - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+
