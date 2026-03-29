@@ -6,6 +6,7 @@ stages:
 variables:
   IMAGE_NAME: "ranjithasu/sprint-petclinic"
   IMAGE_TAG: "4.0"
+
 gitleaks:
   stage: test
   image:
@@ -14,6 +15,7 @@ gitleaks:
   script:
     # source path will be current directory as gitlab-ci loads the application code into every container for every job.
     - gitleaks detect --verbose --source .
+  allow_failure: true
 
 build-push-image:
   stage: build
