@@ -25,7 +25,6 @@ semgrep:
   script:
     - semgrep ci
   allow_failure: true
-    - semgrep ci
 
 build-push-image:
   stage: build
