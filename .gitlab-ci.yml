@@ -41,11 +41,13 @@ upload_reports:
   image: python
   needs:
     - gitleaks
+    - semgrep
   when: always
   before_script:
     - pip3 install requests
   script:
-    - python3 upload-reports.py
+    - python3 upload-reports.py gitleaks-report.json
+    - python3 upload-reports.py semgrep-report.json
 
 build-push-image:
   stage: build
