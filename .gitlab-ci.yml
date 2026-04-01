@@ -14,8 +14,12 @@ gitleaks:
     entrypoint: [""]
   script:
     # source path will be current directory as gitlab-ci loads the application code into every container for every job.
-    - gitleaks detect --verbose --source .
+    - gitleaks detect --verbose --source . -f json -r gitleaks-report.json
   allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - gitleaks-report.json
 
 semgrep:
   stage: test
@@ -23,8 +27,12 @@ semgrep:
   variables:
     SEMGREP_RULES: p/java
   script:
-    - semgrep ci
+    - semgrep ci --json --json-output=semgrep-report.json
   allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - semgrep-report.json
 
 build-push-image:
   stage: build
