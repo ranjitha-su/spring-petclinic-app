@@ -36,6 +36,17 @@ semgrep:
     paths:
       - semgrep-report.json
 
+upload_reports:
+  stage: test
+  image: python
+  needs:
+    - gitleaks
+  when: always
+  before_script:
+    - pip3 install requests
+  script:
+    - python3 upload-reports.py
+
 build-push-image:
   stage: build
   image: docker:29.2.1
