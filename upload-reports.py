@@ -9,6 +9,9 @@ if file_name == 'gitleaks-report.json':
     scan_type = 'Gitleaks Scan'
 elif file_name == 'semgrep-report.json':
     scan_type = 'Semgrep JSON Report'
+elif 'dependency-check-report.json' in file_name:
+    scan_type = 'Dependency Check Scan'
+
 
 defectdojo_apitoken = os.environ.get('DEFECTDOJO_APITOKEN')
 token = "Token {}".format(defectdojo_apitoken)
@@ -21,7 +24,7 @@ data = {
 'verified': True,
 'scan_type': scan_type,
 'minimum_severity': 'Low',
-'engagement': 18
+'engagement': 17
 }
 
 files = {

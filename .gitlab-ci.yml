@@ -36,19 +36,6 @@ semgrep:
     paths:
       - semgrep-report.json
 
-upload_reports:
-  stage: test
-  image: python
-  needs:
-    - gitleaks
-    - semgrep
-  when: always
-  before_script:
-    - pip3 install requests
-  script:
-    - python3 upload-reports.py gitleaks-report.json
-    - python3 upload-reports.py semgrep-report.json
-
 sca:
   stage: test
   image:
@@ -62,8 +49,22 @@ sca:
     when: always
     expire_in: 15 mins
     paths:
-      - sca-report
+      - sca-report/dependency-check-report.json
 
+upload_reports:
+  stage: test
+  image: python
+  needs:
+    - gitleaks
+    - semgrep
+    - sca
+  when: always
+  before_script:
+    - pip3 install requests
+  script:
+    - python3 upload-reports.py gitleaks-report.json
+    - python3 upload-reports.py semgrep-report.json
+    - python3 upload-reports.py sca-report/dependency-check-report.json
 
 build-push-image:
   stage: build
