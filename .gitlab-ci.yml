@@ -38,12 +38,14 @@ semgrep:
 
 sca:
   stage: test
+  variables:
+    NVD_API_KEY: "37a263bf-6f81-465b-9f46-1a5ec67c9347"
   image:
     name: owasp/dependency-check:latest
     entrypoint: [""]
   before_script: ls -al /usr/share/dependency-check/bin/dependency-check.sh
   script:
-    - /usr/share/dependency-check/bin/dependency-check.sh -s . -f JSON -o sca-report
+    - /usr/share/dependency-check/bin/dependency-check.sh -s . -f JSON -o sca-report --nvdApiKey $NVD_API_KEY
   allow_failure: true
   artifacts:
     when: always
