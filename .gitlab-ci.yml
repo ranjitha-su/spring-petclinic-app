@@ -4,8 +4,9 @@ stages:
   - deploy
 
 variables:
-  IMAGE_NAME: "ranjithasu/sprint-petclinic"
+  IMAGE_NAME: "spring-petclinic"
   IMAGE_TAG: "4.0"
+  ECR_REPOSITORY_SERVER: "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME"
 
 gitleaks:
   stage: test
@@ -43,7 +44,9 @@ sca:
   image:
     name: owasp/dependency-check:latest
     entrypoint: [""]
-  before_script: ls -al /usr/share/dependency-check/bin/dependency-check.sh
+  before_script:
+    - ls -al /usr/share/dependency-check/bin/dependency-check.sh
+    - ls -lah /usr/share/dependency-check/data || true
   script:
     - /usr/share/dependency-check/bin/dependency-check.sh -s . -f JSON -o sca-report --nvdApiKey $NVD_API_KEY
   cache:
@@ -79,10 +82,15 @@ build-push-image:
     - docker:29.2.1-dind
   variables:
     DOCKER_BUILDKIT: 1
+    AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+    AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+    AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
   before_script:
-    - echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USERNAME --password-stdin
+    - apk add --no-cache aws-cli
+    - aws ecr get-login-password | docker login -u AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   script:
-    - docker pull $IMAGE_NAME:$IMAGE_TAG || true
-    - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:$IMAGE_TAG .
-    - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker pull $ECR_REPOSITORY_SERVER:$IMAGE_TAG || true
+    - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $ECR_REPOSITORY_SERVER:$IMAGE_TAG -t $ECR_REPOSITORY_SERVER:$IMAGE_TAG .
+    - docker push $ECR_REPOSITORY_SERVER:$IMAGE_TAG
 
