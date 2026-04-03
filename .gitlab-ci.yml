@@ -46,6 +46,10 @@ sca:
   before_script: ls -al /usr/share/dependency-check/bin/dependency-check.sh
   script:
     - /usr/share/dependency-check/bin/dependency-check.sh -s . -f JSON -o sca-report --nvdApiKey $NVD_API_KEY
+  cache:
+    key: dependency-check
+    paths:
+      - /usr/share/dependency-check/data
   allow_failure: true
   artifacts:
     when: always
