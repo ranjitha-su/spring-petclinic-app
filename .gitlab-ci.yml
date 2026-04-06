@@ -46,13 +46,15 @@ sca:
     entrypoint: [""]
   before_script:
     - ls -al /usr/share/dependency-check/bin/dependency-check.sh
-    - ls -lah /usr/share/dependency-check/data || true
+    - mkdir -p dependency-check-data
   script:
-    - /usr/share/dependency-check/bin/dependency-check.sh -s . -f JSON -o sca-report --nvdApiKey $NVD_API_KEY
+    - /usr/share/dependency-check/bin/dependency-check.sh -s . -f JSON -o sca-report --data dependency-check-data --nvdApiKey $NVD_API_KEY
+  after_script:
+    - ls -lah dependency-check-data || true
   cache:
     key: dependency-check
     paths:
-      - /usr/share/dependency-check/data
+      - dependency-check-data/
   allow_failure: true
   artifacts:
     when: always
@@ -82,13 +84,14 @@ build-push-image:
     - docker:29.2.1-dind
   variables:
     DOCKER_BUILDKIT: 1
-    AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-    AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
-    AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
+#    AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+#    AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+#    AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+#    AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
   before_script:
     - apk add --no-cache aws-cli
-    - aws ecr get-login-password | docker login -u AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+    - echo "Default region $AWS_DEFAULT_REGION, account id $AWS_ACCOUNT_ID"
+    - "aws ecr get-login-password | docker login -u AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
   script:
     - docker pull $ECR_REPOSITORY_SERVER:$IMAGE_TAG || true
     - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $ECR_REPOSITORY_SERVER:$IMAGE_TAG -t $ECR_REPOSITORY_SERVER:$IMAGE_TAG .
