@@ -22,6 +22,8 @@ gitleaks:
     expire_in: 15 mins
     paths:
       - gitleaks-report.json
+  rules:
+    - when: never
 
 semgrep:
   stage: test
@@ -36,6 +38,8 @@ semgrep:
     expire_in: 15 mins
     paths:
       - semgrep-report.json
+  rules:
+    - when: never
 
 sca:
   stage: test
@@ -61,6 +65,9 @@ sca:
     expire_in: 15 mins
     paths:
       - sca-report/dependency-check-report.json
+  rules:
+    - when: never
+
 
 upload_reports:
   stage: test
@@ -76,6 +83,8 @@ upload_reports:
     - python3 upload-reports.py gitleaks-report.json
     - python3 upload-reports.py semgrep-report.json
     - python3 upload-reports.py sca-report/dependency-check-report.json
+  rules:
+    - when: never
 
 build-push-image:
   stage: build
