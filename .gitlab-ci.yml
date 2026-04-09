@@ -119,7 +119,9 @@ trivy-scan:
   stage: build
   needs:
     - build-push-image
-  image: aquasec/trivy:latest
+  image:
+    name: aquasec/trivy:canary
+    entrypoint: [""]
   id_tokens:
     AWS_ID_TOKEN:
       aud: https://gitlab.com
