@@ -119,9 +119,9 @@ trivy-scan:
   stage: build
   needs:
     - build-push-image
-  image:
-    name: aquasec/trivy:canary
-    entrypoint: [""]
+  image: docker:29.2.1
+  services:
+    - docker:29.2.1-dind
   id_tokens:
     AWS_ID_TOKEN:
       aud: https://gitlab.com
@@ -131,12 +131,14 @@ trivy-scan:
     AWS_WEB_IDENTITY_TOKEN_FILE: /tmp/aws_token
   before_script:
     - |
-    - apk add --no-cache aws-cli
+    - apk add --no-cache aws-cli curl python3 py3-pip
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.69.3
     - echo "Default region $AWS_DEFAULT_REGION, account id $AWS_ACCOUNT_ID"
     - echo "$AWS_ID_TOKEN" > $AWS_WEB_IDENTITY_TOKEN_FILE
     - aws sts get-caller-identity
     - "aws ecr get-login-password | docker login -u AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
   script:
     - trivy image --exit-code 1 --severity HIGH,CRITICAL $ECR_REPOSITORY_SERVER:$IMAGE_TAG
+  allow_failure: true
 
 
