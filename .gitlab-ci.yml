@@ -91,15 +91,23 @@ build-push-image:
   image: docker:29.2.1
   services:
     - docker:29.2.1-dind
+  id_tokens:
+    AWS_ID_TOKEN:
+      aud: https://gitlab.com
   variables:
     DOCKER_BUILDKIT: 1
+    AWS_ROLE_ARN: arn:aws:iam::460469850064:role/gitlab-ci-federated-role
+    AWS_WEB_IDENTITY_TOKEN_FILE: /tmp/aws_token
 #    AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
 #    AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
 #    AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
 #    AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID
   before_script:
+    - |
     - apk add --no-cache aws-cli
     - echo "Default region $AWS_DEFAULT_REGION, account id $AWS_ACCOUNT_ID"
+    - echo "$AWS_ID_TOKEN" > $AWS_WEB_IDENTITY_TOKEN_FILE
+    - aws sts get-caller-identity
     - "aws ecr get-login-password | docker login -u AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
   script:
     - docker pull $ECR_REPOSITORY_SERVER:$IMAGE_TAG || true
