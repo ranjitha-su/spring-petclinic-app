@@ -153,6 +153,7 @@ trigger_job:
   stage: trigger-downstream-pipeline
   variables:
     NEW_TAG: 4.0
+    UPSTREAM_ENVIRONMENT_NAME: dev
   trigger:
     project: ranjitha-projects/spring-petclinic-gitops
     strategy: depend
