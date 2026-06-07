@@ -156,3 +156,6 @@ trigger_job:
   trigger:
     project: ranjitha-projects/spring-petclinic-gitops
     strategy: depend
+    forward:
+      pipeline_variables: false
+      yaml_variables: true
