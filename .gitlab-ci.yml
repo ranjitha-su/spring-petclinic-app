@@ -151,6 +151,8 @@ trivy-scan:
 
 trigger_job:
   stage: trigger-downstream-pipeline
+  variables:
+    NEW_TAG: 4.0
   trigger:
-    project: ranjitha-projects/spring-petclinic-gitops.git
+    project: ranjitha-projects/spring-petclinic-gitops
     strategy: depend
