@@ -42,8 +42,8 @@ gitleaks:
     expire_in: 15 mins
     paths:
       - gitleaks-report.json
-  rules:
-    - when: never
+  # rules:
+  #   - when: never
 
 semgrep:
   stage: test
@@ -58,8 +58,8 @@ semgrep:
     expire_in: 15 mins
     paths:
       - semgrep-report.json
-  rules:
-    - when: never
+  # rules:
+  #   - when: never
 
 sca:
   stage: test
@@ -85,8 +85,8 @@ sca:
     expire_in: 15 mins
     paths:
       - sca-report/dependency-check-report.json
-  rules:
-    - when: never
+  # rules:
+  #   - when: never
 
 
 upload_reports:
@@ -103,27 +103,20 @@ upload_reports:
     - python3 upload-reports.py gitleaks-report.json
     - python3 upload-reports.py semgrep-report.json
     - python3 upload-reports.py sca-report/dependency-check-report.json
-  rules:
-    - when: never
+  # rules:
+  #   - when: never
 
 build-push-image:
   stage: build
   image: docker:29.2.1
   services:
     - docker:29.2.1-dind
-  id_tokens:
-    AWS_ID_TOKEN:
-      aud: https://gitlab.com
   variables:
     DOCKER_BUILDKIT: 1
-    AWS_ROLE_ARN: arn:aws:iam::460469850064:role/gitlab-ci-federated-role
-    AWS_WEB_IDENTITY_TOKEN_FILE: /tmp/aws_token
   before_script:
     - |
     - apk add --no-cache aws-cli
     - echo "Default region $AWS_DEFAULT_REGION, account id $AWS_ACCOUNT_ID"
-    - echo "$AWS_ID_TOKEN" > $AWS_WEB_IDENTITY_TOKEN_FILE
-    - aws sts get-caller-identity
     - "aws ecr get-login-password | docker login -u AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
   script:
     - docker pull $ECR_REPOSITORY_SERVER:$IMAGE_TAG || true
@@ -138,20 +131,13 @@ trivy-scan:
   image: docker:29.2.1
   services:
     - docker:29.2.1-dind
-  id_tokens:
-    AWS_ID_TOKEN:
-      aud: https://gitlab.com
   variables:
     DOCKER_BUILDKIT: 1
-    AWS_ROLE_ARN: arn:aws:iam::460469850064:role/gitlab-ci-federated-role
-    AWS_WEB_IDENTITY_TOKEN_FILE: /tmp/aws_token
   before_script:
     - |
     - apk add --no-cache aws-cli curl python3 py3-pip
     - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.69.3
     - echo "Default region $AWS_DEFAULT_REGION, account id $AWS_ACCOUNT_ID"
-    - echo "$AWS_ID_TOKEN" > $AWS_WEB_IDENTITY_TOKEN_FILE
-    - aws sts get-caller-identity
     - "aws ecr get-login-password | docker login -u AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com"
   script:
     - trivy image --exit-code 1 --severity HIGH,CRITICAL $ECR_REPOSITORY_SERVER:$IMAGE_TAG
