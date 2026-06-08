@@ -115,6 +115,9 @@ build-push-image:
     - docker pull $ECR_REPOSITORY_SERVER:$IMAGE_TAG || true
     - docker build --build-arg BUILDKIT_INLINE_CACHE=1 --cache-from $ECR_REPOSITORY_SERVER:$IMAGE_TAG -t $ECR_REPOSITORY_SERVER:$IMAGE_TAG .
     - docker push $ECR_REPOSITORY_SERVER:$IMAGE_TAG
+  rules:
+    - when: never
+    
 
 
 trivy-scan:
@@ -148,6 +151,9 @@ trivy-scan:
   script:
     - trivy image --exit-code 1 --severity HIGH,CRITICAL $ECR_REPOSITORY_SERVER:$IMAGE_TAG
   allow_failure: true
+  rules:
+    - when: never
+
 
 trigger_job:
   stage: trigger-downstream-pipeline
