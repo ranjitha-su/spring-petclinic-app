@@ -151,14 +151,11 @@ trivy-scan:
 
 trigger_job:
   stage: trigger-downstream-pipeline
-  variables:
-    SERVICE_NAME: "spring-petclinic-app"
-    NEW_TAG: "$IMAGE_TAG"
-    UPSTREAM_ENVIRONMENT_NAME: dev
   trigger:
     project: ranjitha-projects/spring-petclinic-gitops
     branch: main
     strategy: depend
-    forward:
-      pipeline_variables: false
-      yaml_variables: true
+    inputs:
+      SERVICE_NAME: "spring-petclinic-app"
+      NEW_TAG: "$IMAGE_TAG"
+      UPSTREAM_ENVIRONMENT_NAME: dev
