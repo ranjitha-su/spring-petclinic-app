@@ -30,7 +30,7 @@ Security is not an afterthought here. Every code push triggers secrets scanning,
 ### Prerequisites
 
 - GitLab account with CI/CD enabled
-- AWS account with ECR repository created
+- AWS account with ECR repository - **spring-petclinic** created
 - IAM Role configured for GitLab OIDC federation
 - Docker installed locally (for local testing)
 
