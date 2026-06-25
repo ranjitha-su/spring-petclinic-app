@@ -1,7 +1,7 @@
 # 🔐 Application CI Security Pipeline with GitLab CI/CD
 
 > **Part of a 3-repo End-to-End DevSecOps Application release pipeline.**  
-> | [spring-petclinic-app](https://gitlab.com/ranjitha-projects/spring-petclinic-app) | [spring-petclinic-gitops](https://gitlab.com/ranjitha-projects/spring-petclinic-gitops) | [eks-platform](https://gitlab.com/ranjitha-projects/terraform-eks-platform) |
+> | [spring-petclinic-app](https://github.com/ranjitha-su/spring-petclinic-app) | [spring-petclinic-gitops](https://github.com/ranjitha-su/spring-petclinic-gitops) | [terraform-eks-platform](https://github.com/ranjitha-su/terraform-eks-platform) |
 
 ---
 
